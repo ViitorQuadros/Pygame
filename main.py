@@ -11,7 +11,6 @@ HEIGHT = 600
 
 # Cores
 WHITE = (255, 255, 255)
-RED = (255, 0, 0)
 
 # Inicialização do Pygame
 pygame.init()
@@ -23,6 +22,11 @@ clock = pygame.time.Clock()
 
 # Carregar imagem de fundo
 background_image = pygame.image.load("bg.jpg")
+
+# Carregar música de fundo
+pygame.mixer.music.load("Space_Machine_Power.mp3")
+pygame.mixer.music.set_volume(0.5)  # Definir volume da música de fundo
+pygame.mixer.music.play(-1)  # Reproduzir a música de fundo em um loop infinito
 
 # Lista para armazenar as estrelas marcadas
 stars = []
@@ -65,45 +69,45 @@ def calculate_distance(star1, star2):
 def draw_stars():
     for i in range(len(stars)):
         pos, name = stars[i]
-        pygame.draw.circle(screen, RED, pos, 5)
+        pygame.draw.circle(screen, WHITE, pos, 5)
         font = pygame.font.SysFont(None, 20)
         
         if name == "Desconhecido":
-            text = font.render(name, True, RED)
+            text = font.render(name, True, WHITE)
             text_rect = text.get_rect(center=(pos[0], pos[1] - 15))
             screen.blit(text, text_rect)
             
             # Exibir coordenadas ao lado do texto "Desconhecido"
-            coord_text = font.render(f"({pos[0]}, {pos[1]})", True, RED)
+            coord_text = font.render(f"({pos[0]}, {pos[1]})", True, WHITE)
             coord_text_rect = coord_text.get_rect(left=text_rect.right + 5, centery=text_rect.centery)
             screen.blit(coord_text, coord_text_rect)
             
         else:
-            text = font.render(name, True, RED)
+            text = font.render(name, True, WHITE)
             text_rect = text.get_rect(center=(pos[0], pos[1] - 15))
             screen.blit(text, text_rect)
             
         if i > 0:
             prev_pos, _ = stars[i-1]
-            pygame.draw.line(screen, RED, prev_pos, pos, 1)
+            pygame.draw.line(screen, WHITE, prev_pos, pos, 1)
             
             # Exibir distância entre as marcações
             distance = calculate_distance(stars[i-1], stars[i])
-            distance_text = font.render(f"{distance:.2f}", True, RED)
+            distance_text = font.render(f"{distance:.2f}", True, WHITE)
             distance_text_rect = distance_text.get_rect(center=((prev_pos[0] + pos[0]) // 2, (prev_pos[1] + pos[1]) // 2 - 15))
             screen.blit(distance_text, distance_text_rect)
     
     # Exibir informações dos botões F10, F11 e F12
     font = pygame.font.SysFont(None, 18)
-    f10_text = font.render("F10 - Salvar", True, RED)
+    f10_text = font.render("F10 - Salvar", True, WHITE)
     f10_rect = f10_text.get_rect(top=10, left=10)
     screen.blit(f10_text, f10_rect)
     
-    f11_text = font.render("F11 - Carregar", True, RED)
+    f11_text = font.render("F11 - Carregar", True, WHITE)
     f11_rect = f11_text.get_rect(top=f10_rect.bottom + 5, left=10)
     screen.blit(f11_text, f11_rect)
     
-    f12_text = font.render("F12 - Apagar", True, RED)
+    f12_text = font.render("F12 - Apagar", True, WHITE)
     f12_rect = f12_text.get_rect(top=f11_rect.bottom + 5, left=10)
     screen.blit(f12_text, f12_rect)
 
@@ -123,6 +127,7 @@ while running:
         if event.type == QUIT:
             # Salvar as marcações antes de fechar
             save_stars()
+            pygame.mixer.music.stop()  # Parar a reprodução da música de fundo
             running = False
         elif event.type == MOUSEBUTTONDOWN and event.button == 1:
             # Capturar a posição do clique do mouse
@@ -139,17 +144,18 @@ while running:
             elif event.key == K_F12:
                 delete_stars()
             elif event.key == K_ESCAPE:
-                # Salvar as marcações ao pressionar a tecla ESC
+                # Salvar as marcações e gerar evento de encerramento
                 save_stars()
+                pygame.event.post(pygame.event.Event(QUIT))
 
     draw_stars()
 
     # Exibir coordenadas cartesianas
     font = pygame.font.SysFont(None, 18)
-    for pos, _ in stars:
-        coord_text = font.render(f"({pos[0]}, {pos[1]})", True, RED)
-        coord_text_rect = coord_text.get_rect(top=pos[1] + 10, left=pos[0] - 20)
-        screen.blit(coord_text, coord_text_rect)
+    #for pos, _ in stars:
+        #coord_text = font.render(f"({pos[0]}, {pos[1]})", True, WHITE)
+        #coord_text_rect = coord_text.get_rect(top=pos[1] + 10, left=pos[0] - 20)
+        #screen.blit(coord_text, coord_text_rect)
 
     # Atualização da tela
     pygame.display.flip()
