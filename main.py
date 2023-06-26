@@ -1,34 +1,34 @@
 import pygame
 import sys
 from pygame.locals import *
-from tkinter import Tk, simpledialog, messagebox
+from tkinter import Tk, simpledialog
 import pickle
 import math
 
-# Configurações da tela
+
 WIDTH = 800
 HEIGHT = 600
-
-# Cores
 WHITE = (255, 255, 255)
 
-# Inicialização do Pygame
+
 pygame.init()
 
-# Inicialização da tela
+
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Space Marker")
 clock = pygame.time.Clock()
 
-# Carregar imagem de fundo
+icon = pygame.image.load("space.png")
+pygame.display.set_icon(icon)
+
+
 background_image = pygame.image.load("bg.jpg")
 
-# Carregar música de fundo
-pygame.mixer.music.load("Space_Machine_Power.mp3")
-pygame.mixer.music.set_volume(0.5)  # Definir volume da música de fundo
-pygame.mixer.music.play(-1)  # Reproduzir a música de fundo em um loop infinito
 
-# Lista para armazenar as estrelas marcadas
+pygame.mixer.music.load("Space_Machine_Power.mp3")
+pygame.mixer.music.set_volume(0.5)  
+pygame.mixer.music.play(-1)  
+
 stars = []
 
 def save_stars():
@@ -56,7 +56,7 @@ def get_star_name():
     root.withdraw()
     star_name = simpledialog.askstring("Nome da Estrela", "Digite o nome da estrela:")
     if star_name is None or star_name.strip() == "":
-        messagebox.showinfo("Nome Inválido", "O nome da estrela não pode estar vazio. Será usado o nome 'Desconhecido'.")
+        #messagebox.showinfo("Nome Inválido", "O nome da estrela não pode estar vazio. Será usado o nome 'Desconhecido'.")
         star_name = "Desconhecido"
     return star_name
 
@@ -77,7 +77,7 @@ def draw_stars():
             text_rect = text.get_rect(center=(pos[0], pos[1] - 15))
             screen.blit(text, text_rect)
             
-            # Exibir coordenadas ao lado do texto "Desconhecido"
+        
             coord_text = font.render(f"({pos[0]}, {pos[1]})", True, WHITE)
             coord_text_rect = coord_text.get_rect(left=text_rect.right + 5, centery=text_rect.centery)
             screen.blit(coord_text, coord_text_rect)
@@ -91,13 +91,13 @@ def draw_stars():
             prev_pos, _ = stars[i-1]
             pygame.draw.line(screen, WHITE, prev_pos, pos, 1)
             
-            # Exibir distância entre as marcações
+         
             distance = calculate_distance(stars[i-1], stars[i])
             distance_text = font.render(f"{distance:.2f}", True, WHITE)
             distance_text_rect = distance_text.get_rect(center=((prev_pos[0] + pos[0]) // 2, (prev_pos[1] + pos[1]) // 2 - 15))
             screen.blit(distance_text, distance_text_rect)
     
-    # Exibir informações dos botões F10, F11 e F12
+    
     font = pygame.font.SysFont(None, 18)
     f10_text = font.render("F10 - Salvar", True, WHITE)
     f10_rect = f10_text.get_rect(top=10, left=10)
@@ -112,41 +112,40 @@ def draw_stars():
     screen.blit(f12_text, f12_rect)
 
 
-# Carregar marcações salvas (se existirem)
+
 load_stars()
 
 running = True
 while running:
-    # Limpeza da tela
+    
     screen.fill(WHITE)
 
-    # Desenhar imagem de fundo
+   
     screen.blit(background_image, (0, 0))
 
     for event in pygame.event.get():
-        if event.type == QUIT:
-            # Salvar as marcações antes de fechar
-            save_stars()
-            pygame.mixer.music.stop()  # Parar a reprodução da música de fundo
-            running = False
-        elif event.type == MOUSEBUTTONDOWN and event.button == 1:
-            # Capturar a posição do clique do mouse
-            mouse_pos = pygame.mouse.get_pos()
-
-            # Abrir caixa de diálogo para obter o nome da estrela
-            star_name = get_star_name()
-            stars.append((mouse_pos, star_name))
-        elif event.type == KEYDOWN:
-            if event.key == K_F10:
+        try:
+            if event.type == QUIT:
                 save_stars()
-            elif event.key == K_F11:
-                load_stars()
-            elif event.key == K_F12:
-                delete_stars()
-            elif event.key == K_ESCAPE:
-                # Salvar as marcações e gerar evento de encerramento
-                save_stars()
-                pygame.event.post(pygame.event.Event(QUIT))
+                pygame.mixer.music.stop()  
+                running = False
+            elif event.type == MOUSEBUTTONDOWN and event.button == 1:
+                mouse_pos = pygame.mouse.get_pos()
+                star_name = get_star_name()
+                stars.append((mouse_pos, star_name))
+            elif event.type == KEYDOWN:
+                if event.key == K_F10:
+                    save_stars()
+                elif event.key == K_F11:
+                    load_stars()
+                elif event.key == K_F12:
+                    delete_stars()
+                elif event.key == K_ESCAPE:
+                    # Salvar as marcações e gerar evento de encerramento
+                    save_stars()
+                    pygame.event.post(pygame.event.Event(QUIT))
+        except Exception as e:
+            print("Erro no tratamento de eventos:", e)
 
     draw_stars()
 
@@ -157,10 +156,8 @@ while running:
         #coord_text_rect = coord_text.get_rect(top=pos[1] + 10, left=pos[0] - 20)
         #screen.blit(coord_text, coord_text_rect)
 
-    # Atualização da tela
     pygame.display.flip()
     clock.tick(60)
 
-# Finalização do Pygame
 pygame.quit()
 sys.exit()
