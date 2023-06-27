@@ -5,7 +5,7 @@ Integrantes
 Vitor Augusto Feil Quadros - RA: 1134821
 Ariel Diefenthaeler Oliveira - RA: 1134433
 
-link da build do projeto no mega
+link da build do projeto no drive
 https://drive.google.com/file/d/1ExPzY1CgvrE-IM9MQSC3GCK-xhsqODFk/view
 
 Link da build do projeto no mega por garantia
